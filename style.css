@@ -1,0 +1,60 @@
+#body {
+
+    color: red;
+    background-color: black;
+
+}
+
+
+.top-buffer {
+    margin-top: 2%;
+}
+
+.square {
+    float:left;
+    position: relative;
+    width: 50%;
+    padding-bottom : 50%; /* = width for a 1:1 aspect ratio */
+    overflow:hidden;
+    border: 2px solid black;
+}
+
+.content {
+    position:absolute;
+    height:100%; /* = 100% - 2*5% padding */
+    width:100%; /* = 100% - 2*5% padding */
+    
+}
+
+
+/*DISPLAYS AND BUTTONS*/
+
+#display {
+    /*background-color: black;*/
+    color: red;
+    font-size: 20pt;
+    font-family: 'Orbitron', sans-serif;
+}
+
+#middle-row {
+    background-color: black;
+}
+
+/*GAME BUTTONS*/
+
+.btn-green {
+    background-color: green;
+}
+
+.btn-red {
+    background-color: red;
+}
+
+.btn-yellow {
+    background-color: yellow;
+}
+
+.btn-blue {
+    background-color: blue;
+}
+
