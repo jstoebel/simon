@@ -4,9 +4,24 @@ var Simon = function(strict) {
     //strict (bool): if we are playing the game in strict mode
 
     //SET UP
-    this.strict = strict;
-    this.speed = 1000;  //speed of time between moves (in ms)
-    this.moves = [];
+
+    this.init = function() {
+        this.strict = strict;
+        this.speed = 1000;  //speed of time between moves (in ms)
+        this.moves = [];
+        
+        //set up sounds
+        this.sounds = [];
+        for(var i=0; i<4;i++){
+            var baseUrl = "https://s3.amazonaws.com/freecodecamp/simonSound";
+            var soundUrl = baseUrl.concat(Number(i)+1).concat(".mp3");
+            var sound = new Audio(soundUrl);
+            this.sounds.push(sound);     
+        }
+
+        var wrongSound = new Audio("http://www.tvdsb.ca/webpages/balestrins/files/voicebuzzer.mp3");
+        this.sounds = wrongSound;
+    }
 
     //METHODS
 
@@ -25,9 +40,9 @@ var Simon = function(strict) {
         //btn(integer): index of button to flash
 
 
-        $(btn).toggleClass("flash") //add class to light up
+        $(btn).addClass("flash") //add class to light up
         setTimeout(function(){
-            $(btn).toggleClass("flash") //turn flash off
+            $(btn).removeClass("flash") //turn flash off
         }, this.speed)
     }
 
@@ -35,7 +50,7 @@ var Simon = function(strict) {
         //plays the button's correct sound
         //btn(integer): index of button to play sound for
         var baseUrl = "https://s3.amazonaws.com/freecodecamp/simonSound";
-        var soundUrl = baseUrl.concat(btn+1).concat(".mp3");
+        var soundUrl = baseUrl.concat(Number(btn)+1).concat(".mp3");
         var sound = new Audio(soundUrl);
         sound.play();
     }
@@ -62,39 +77,41 @@ var Simon = function(strict) {
     this.allCorrect = function(){
         //determines if each guesss is right
 
+        var game = this;
         return this.guesses.every(function(curr, i){
-            return curr == this.moves[i];
+            return curr == game.moves[i];
         })
     }
 
     this.takeGuess = function(){
         this.guesses = [];
-        $(".simon-btn").on("click", function(event){
+        var game = this;
+        $(".simon-btn").on("click", (function(event){
             //add to guesses
             var clicked = event.target.id;
             var btnNum = clicked.match(/\d/)[0];
-            this.guesses.push(btnNum)
-            this.flash(btnNum);
-            if (this.allCorrect()){
+            game.guesses.push(btnNum)
+            game.flash(btnNum);
+            if (game.allCorrect()){
                 //correct!
 
-                this.playCorrectSound(btnNum);
-                if (this.guesses.length == this.moves.length){
-                    this.levelUp();
+                game.playCorrectSound(btnNum);
+                if (game.guesses.length == game.moves.length){
+                    game.levelUp();
                 }
 
             } else {
                 //got something wrong!
-                this.playWrongSound();
+                game.playWrongSound();
                 
-                if(this.strict){
-                    this.gameOver(false);
+                if(game.strict){
+                    game.gameOver(false);
                 } else {
-                    this.playback();
+                    game.playback();
                 }
             }
 
-        }).bind(this)
+        }).bind(this))
     } 
 
 
@@ -140,9 +157,11 @@ var Simon = function(strict) {
 
 $(document).ready(function(){
 
-    //handler for start
-    $("#start-btn").on("click", function(){
+    console.log("ready!")
 
+    // handler for start
+    $("#start-btn").on("click", function(){
+        console.log("start clicked")
         $("#start-btn").off("click")    //can't click again! must use restart
         var strict = $("#strict-btn").hasClass("active")
         var game = new Simon(strict);

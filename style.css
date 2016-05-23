@@ -2,7 +2,6 @@
 
     color: red;
     background-color: black;
-
 }
 
 
@@ -42,6 +41,10 @@
 
 /*GAME BUTTONS*/
 
+.simon-btn {
+    -webkit-filter: brightness(0.7);
+}
+
 .btn-green {
     background-color: green;
 }
@@ -58,3 +61,6 @@
     background-color: blue;
 }
 
+.flash {
+    -webkit-filter: brightness(1.0);
+}
