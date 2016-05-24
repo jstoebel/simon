@@ -5,30 +5,25 @@ var Simon = function(strict) {
 
     //SET UP
 
-    this.init = function() {
-        this.strict = strict;
-        this.speed = 1000;  //speed of time between moves (in ms)
-        this.moves = [];
-        
-        //set up sounds
-        this.sounds = [];
-        for(var i=0; i<4;i++){
-            var baseUrl = "https://s3.amazonaws.com/freecodecamp/simonSound";
-            var soundUrl = baseUrl.concat(Number(i)+1).concat(".mp3");
-            var sound = new Audio(soundUrl);
-            this.sounds.push(sound);     
-        }
-
-        var wrongSound = new Audio("http://www.tvdsb.ca/webpages/balestrins/files/voicebuzzer.mp3");
-        this.sounds = wrongSound;
+    this.strict = strict;
+    this.speed = 1000;  //speed of time between moves (in ms)
+    this.moves = [];
+    
+    //set up sounds
+    this.sounds = {};
+    for(var i=1; i<=4; i++){
+        var baseUrl = "https://s3.amazonaws.com/freecodecamp/simonSound";
+        var soundUrl = baseUrl.concat(Number(i)).concat(".mp3");
+        var sound = new Audio(soundUrl);
+        this.sounds[i] = sound;     
     }
+
+    this.wrongSound = new Audio("http://www.tvdsb.ca/webpages/balestrins/files/voicebuzzer.mp3");
 
     //METHODS
 
-    //add step
-
     this.addStep = function(){
-        var step = (Math.floor((Math.random() * 4) + 1)) - 1;
+        var step = (Math.floor((Math.random() * 4) + 1));
         this.moves.push(step);
         this.playback();
     }
@@ -46,30 +41,50 @@ var Simon = function(strict) {
         }, this.speed)
     }
 
-    this.playCorrectSound = function(btn){
-        //plays the button's correct sound
-        //btn(integer): index of button to play sound for
-        var baseUrl = "https://s3.amazonaws.com/freecodecamp/simonSound";
-        var soundUrl = baseUrl.concat(Number(btn)+1).concat(".mp3");
-        var sound = new Audio(soundUrl);
-        sound.play();
+    this.playCorrectSound = function(n){
+        // n(int): key of sound to play (1-4)
+
+        this.sounds[n].play(); 
     }
 
     this.playWrongSound = function(){
-        var sound = new Audio("http://www.tvdsb.ca/webpages/balestrins/files/voicebuzzer.mp3");
-        sound.play();
+        this.wrongSound.play();
     }
 
     this.playback = function(){
         //playback the current set of moves.
 
         //TODO no button clicks allowed here!
+        var game = this;
 
-        for(var m=0; m<this.moves.length; m++){
-            var move = this.moves[m];
-            var btn = "#btn"+move
-            this.flash(btn);
+        function* getMove(){
+            var mi = 0;
+            while(mi < game.moves.length){
+                yield game.moves[mi]
+                mi++
+            }
         }
+
+        //HERE WE NEED A WAY FOR THE CALL BACK TO CALL THE NEXT MOVE 
+        var moveGen = getMove();
+
+
+        var move = moveGen.next().value
+        var btn = "#btn"+move
+        $(btn).addClass("flash")
+        this.playCorrectSound(move);
+        setTimeout(function(){
+            $(btn).removeClass("flash") //turn flash off
+            
+
+        }, this.speed)
+
+        // for(var m=0; m<this.moves.length; m++){
+        //     var move = this.moves[m];
+        //     var btn = "#btn"+move
+        //     this.flash(btn);
+        //     this.playCorrectSound(move);
+        // }
 
         this.takeGuess();
     }
@@ -159,31 +174,39 @@ $(document).ready(function(){
 
     console.log("ready!")
 
+
+    //THE ACTUAL GAME
     // handler for start
-    $("#start-btn").on("click", function(){
-        console.log("start clicked")
-        $("#start-btn").off("click")    //can't click again! must use restart
-        var strict = $("#strict-btn").hasClass("active")
-        var game = new Simon(strict);
-        game.addStep();
-    })
+    // $("#start-btn").on("click", function(){
+    //     console.log("start clicked")
+    //     $("#start-btn").off("click")    //can't click again! must use restart
+    //     var strict = $("#strict-btn").hasClass("active")
+    //     var game = new Simon(strict);
+    //     game.addStep();
+    // })
 
 
-    //handler for strict
-    $("#strict-btn").on("click", function(){
-        $("#strict-btn").toggleClass("active")
-    })
+    // //handler for strict
+    // $("#strict-btn").on("click", function(){
+    //     $("#strict-btn").toggleClass("active")
+    // })
 
-    //handler for reset
+    // //handler for reset
 
-    $("#reset-btn").on("click", function(){
+    // $("#reset-btn").on("click", function(){
 
-        $("#display").text(0);
+    //     $("#display").text(0);
 
-        var strict = $("#strict-btn").hasClass("active")
-        var newGame = new Simon(strict);
-        game.addStep();
-    })
+    //     var strict = $("#strict-btn").hasClass("active")
+    //     var newGame = new Simon(strict);
+    //     game.addStep();
+    // })
 
+
+    //TESTING
+
+    var game = new Simon(false);
+    game.moves = [1,2,3,4];
+    // game.playback();
 
 })
