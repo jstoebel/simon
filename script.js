@@ -30,20 +30,39 @@ var Simon = function(strict) {
 
     //playback
 
-    this.flash = function(btn){
-        //button flashes on and plays its sound and then after this.speed turns off
-        //btn(integer): index of button to flash
+    this.flash = function(move){
+        //adds flash class to button
+        //move(int) index of button to flash
+        //helper method for playbackFlash only!
 
+        var btn = "#btn"+move;
+        $(btn).addClass("flash"); //add class to light up
 
-        $(btn).addClass("flash") //add class to light up
-        setTimeout(function(){
-            $(btn).removeClass("flash") //turn flash off
-        }, this.speed)
+    }
+
+    this.playbackFlash = function(moveGen){
+        //flashes button, plays sound and sets timer. When timer goes off, decide if it should call again.
+        //moveGen: generator that traverses the moves array
+        //this function is recursive. It uses a generator to determine the next item in the array to act on.
+        //when we fall off the end of the array, the method will stop recursing.
+
+        var move_obj = moveGen.next()
+        if(move_obj.done == false){
+            var move = move_obj.value
+            var btn = "#btn"+move;
+            this.flash(move)
+            var game = this;
+            setTimeout(function(){
+                $(btn).removeClass("flash") //add class to light up
+                game.playCorrectSound(move);
+                game.playbackFlash(moveGen)
+            }, this.speed)
+        }
+
     }
 
     this.playCorrectSound = function(n){
         // n(int): key of sound to play (1-4)
-
         this.sounds[n].play(); 
     }
 
@@ -65,27 +84,8 @@ var Simon = function(strict) {
             }
         }
 
-        //HERE WE NEED A WAY FOR THE CALL BACK TO CALL THE NEXT MOVE 
         var moveGen = getMove();
-
-
-        var move = moveGen.next().value
-        var btn = "#btn"+move
-        $(btn).addClass("flash")
-        this.playCorrectSound(move);
-        setTimeout(function(){
-            $(btn).removeClass("flash") //turn flash off
-            
-
-        }, this.speed)
-
-        // for(var m=0; m<this.moves.length; m++){
-        //     var move = this.moves[m];
-        //     var btn = "#btn"+move
-        //     this.flash(btn);
-        //     this.playCorrectSound(move);
-        // }
-
+        this.playbackFlash(moveGen);
         this.takeGuess();
     }
 
@@ -98,6 +98,13 @@ var Simon = function(strict) {
         })
     }
 
+    this.playerFlash = function(){
+        //flashes a button when a player clicks it
+        //button flashes on click and unflashes after 100ms
+
+
+    }
+
     this.takeGuess = function(){
         this.guesses = [];
         var game = this;
@@ -106,7 +113,11 @@ var Simon = function(strict) {
             var clicked = event.target.id;
             var btnNum = clicked.match(/\d/)[0];
             game.guesses.push(btnNum)
-            game.flash(btnNum);
+
+
+            //flash the button
+
+
             if (game.allCorrect()){
                 //correct!
 
@@ -175,38 +186,39 @@ $(document).ready(function(){
     console.log("ready!")
 
 
-    //THE ACTUAL GAME
+    // THE ACTUAL GAME
+
     // handler for start
-    // $("#start-btn").on("click", function(){
-    //     console.log("start clicked")
-    //     $("#start-btn").off("click")    //can't click again! must use restart
-    //     var strict = $("#strict-btn").hasClass("active")
-    //     var game = new Simon(strict);
-    //     game.addStep();
-    // })
+    $("#start-btn").on("click", function(){
+        console.log("start clicked")
+        $("#start-btn").off("click")    //can't click again! must use restart
+        var strict = $("#strict-btn").hasClass("active")
+        var game = new Simon(strict);
+        game.addStep();
+    })
 
 
-    // //handler for strict
-    // $("#strict-btn").on("click", function(){
-    //     $("#strict-btn").toggleClass("active")
-    // })
+    //handler for strict
+    $("#strict-btn").on("click", function(){
+        $("#strict-btn").toggleClass("active")
+    })
 
-    // //handler for reset
+    //handler for reset
 
-    // $("#reset-btn").on("click", function(){
+    $("#reset-btn").on("click", function(){
 
-    //     $("#display").text(0);
+        $("#display").text(0);
 
-    //     var strict = $("#strict-btn").hasClass("active")
-    //     var newGame = new Simon(strict);
-    //     game.addStep();
-    // })
+        var strict = $("#strict-btn").hasClass("active")
+        var newGame = new Simon(strict);
+        game.addStep();
+    })
 
 
     //TESTING
 
-    var game = new Simon(false);
-    game.moves = [1,2,3,4];
+    // var game = new Simon(false);
+    // game.moves = [1,2,1,2];
     // game.playback();
 
 })
