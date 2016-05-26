@@ -15,6 +15,7 @@ var Simon = function(strict) {
         var baseUrl = "https://s3.amazonaws.com/freecodecamp/simonSound";
         var soundUrl = baseUrl.concat(Number(i)).concat(".mp3");
         var sound = new Audio(soundUrl);
+        sound.volume = 1.0
         this.sounds[i] = sound;     
     }
 
@@ -22,24 +23,24 @@ var Simon = function(strict) {
 
     //METHODS
 
-    this.addStep = function(){
-        var step = (Math.floor((Math.random() * 4) + 1));
-        this.moves.push(step);
-        this.playback();
-    }
-
     //playback
 
     this.flash = function(move){
         //adds flash class to button
         //move(int) index of button to flash
-        //helper method for playbackFlash only!
 
         var btn = "#btn"+move;
         $(btn).addClass("flash"); //add class to light up
-
     }
 
+    this.endFlash = function(move) {
+        //removes a flash for a button
+        //move(int) index of button to flash
+
+        var btn = "#btn"+move;
+        $(btn).removeClass("flash"); //add class to light up
+
+    }
     this.playbackFlash = function(moveGen){
         //flashes button, plays sound and sets timer. When timer goes off, decide if it should call again.
         //moveGen: generator that traverses the moves array
@@ -51,12 +52,15 @@ var Simon = function(strict) {
             var move = move_obj.value
             var btn = "#btn"+move;
             this.flash(move)
+            this.playCorrectSound(move);
             var game = this;
             setTimeout(function(){
-                $(btn).removeClass("flash") //add class to light up
-                game.playCorrectSound(move);
+                game.endFlash(move)
+
                 game.playbackFlash(moveGen)
             }, this.speed)
+        } else {
+            this.takeGuess();
         }
 
     }
@@ -86,7 +90,6 @@ var Simon = function(strict) {
 
         var moveGen = getMove();
         this.playbackFlash(moveGen);
-        this.takeGuess();
     }
 
     this.allCorrect = function(){
@@ -98,10 +101,16 @@ var Simon = function(strict) {
         })
     }
 
-    this.playerFlash = function(){
-        //flashes a button when a player clicks it
-        //button flashes on click and unflashes after 100ms
+    this.playerFlash = function(move){
+        //handles button flashing for player clicks
+        //button flashes and then unflashes after 100ms 
+        //move(int): button to flash
 
+        this.flash(move);
+        var game = this;
+        setTimeout(function(){
+            game.endFlash(move);
+        }, 300)
 
     }
 
@@ -116,18 +125,18 @@ var Simon = function(strict) {
 
 
             //flash the button
-
+            game.playerFlash(btnNum); 
 
             if (game.allCorrect()){
                 //correct!
-
                 game.playCorrectSound(btnNum);
+
                 if (game.guesses.length == game.moves.length){
                     game.levelUp();
                 }
 
             } else {
-                //got something wrong!
+                //wrong guess!
                 game.playWrongSound();
                 
                 if(game.strict){
@@ -139,6 +148,12 @@ var Simon = function(strict) {
 
         }).bind(this))
     } 
+
+    this.addStep = function(){
+        var step = (Math.floor((Math.random() * 4) + 1));
+        this.moves.push(step);
+        this.playback();
+    }
 
 
     this.levelUp = function(){
@@ -159,9 +174,11 @@ var Simon = function(strict) {
                 this.speed = 500;
                 break
         }
+
+        this.addStep();
+
     }
 
-    //update counter
 
     this.updateCounter = function(n){
         //updates counter with value of n
@@ -218,7 +235,7 @@ $(document).ready(function(){
     //TESTING
 
     // var game = new Simon(false);
-    // game.moves = [1,2,1,2];
+    // game.moves = [1,1,1,2];
     // game.playback();
 
 })
