@@ -47,17 +47,24 @@ var Simon = function(strict) {
         //this function is recursive. It uses a generator to determine the next item in the array to act on.
         //when we fall off the end of the array, the method will stop recursing.
 
+        $("simon-btn").removeClass("flash");
+        $(".simon-btn").off("click")
         var move_obj = moveGen.next()
         if(move_obj.done == false){
-            var move = move_obj.value
+
+            var move = move_obj.value;
+            console.log("flashing "+move);
             var btn = "#btn"+move;
             this.flash(move)
             this.playCorrectSound(move);
             var game = this;
             setTimeout(function(){
+                //timer to end current flash
                 game.endFlash(move)
-
-                game.playbackFlash(moveGen)
+                setTimeout(function(){
+                    //timer before next flash
+                    game.playbackFlash(moveGen)
+                }, 200)
             }, this.speed)
         } else {
             this.takeGuess();
@@ -78,6 +85,9 @@ var Simon = function(strict) {
         //playback the current set of moves.
 
         //TODO no button clicks allowed here!
+
+        console.log("starting playback:");
+        console.log(this.moves);
         var game = this;
 
         function* getMove(){
@@ -106,10 +116,10 @@ var Simon = function(strict) {
         //button flashes and then unflashes after 100ms 
         //move(int): button to flash
 
-        this.flash(move);
         var game = this;
+        this.flash(move)
         setTimeout(function(){
-            game.endFlash(move);
+            game.endFlash(move)    
         }, 300)
 
     }
@@ -142,7 +152,10 @@ var Simon = function(strict) {
                 if(game.strict){
                     game.gameOver(false);
                 } else {
-                    game.playback();
+                    setTimeout(function(){
+
+                        game.playback();
+                    }, 1000)
                 }
             }
 
@@ -159,6 +172,7 @@ var Simon = function(strict) {
     this.levelUp = function(){
         //advance to next level unless we are on level 20, in which case the player wins!
 
+        console.log("level up!")
         switch(this.moves.length) {
 
             case 20:
@@ -175,10 +189,14 @@ var Simon = function(strict) {
                 break
         }
 
-        this.addStep();
+        //need a 500ms delay here
+        console.log("starting delay before next level")
+        var game = this;
+        setTimeout(function(){
+            game.addStep();
+        }, 750)
 
     }
-
 
     this.updateCounter = function(n){
         //updates counter with value of n
@@ -194,6 +212,8 @@ var Simon = function(strict) {
         } else {
             console.log("You lose!")
         }
+
+        //TODO other clean up needed here
     }
 
 }
@@ -235,7 +255,7 @@ $(document).ready(function(){
     //TESTING
 
     // var game = new Simon(false);
-    // game.moves = [1,1,1,2];
+    // game.moves = [1,1,1];
     // game.playback();
 
 })
