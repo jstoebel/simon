@@ -235,7 +235,6 @@ var Simon = function() {
 function startGame(){
     //start a new game
     var newGame = new Simon();
-    newGame.moves = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     newGame.addStep();
 }
 

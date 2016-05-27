@@ -1,66 +1,72 @@
 #body {
-
-    color: red;
-    background-color: black;
+  color: red;
+  background-color: black;
+  font-family: 'Orbitron', sans-serif; 
 }
 
+.title {
+  font-size: 32pt;
+}
 
 .top-buffer {
-    margin-top: 2%;
+  margin-top: 2%;
 }
 
 .square {
-    float:left;
-    position: relative;
-    width: 50%;
-    padding-bottom : 50%; /* = width for a 1:1 aspect ratio */
-    overflow:hidden;
-    border: 2px solid black;
+  float: left;
+  position: relative;
+  width: 50%;
+  padding-bottom: 50%;
+  /* = width for a 1:1 aspect ratio */
+  overflow: hidden;
+  border: 2px solid black;
 }
 
 .content {
-    position:absolute;
-    height:100%; /* = 100% - 2*5% padding */
-    width:100%; /* = 100% - 2*5% padding */
-    
+  position: absolute;
+  height: 100%;
+  /* = 100% - 2*5% padding */
+  width: 100%;
+  /* = 100% - 2*5% padding */
 }
 
 
 /*DISPLAYS AND BUTTONS*/
 
 #display {
-    /*background-color: black;*/
-    color: red;
-    font-size: 20pt;
-    font-family: 'Orbitron', sans-serif;
+  /*background-color: black;*/
+  color: red;
+  font-size: 20pt;
+
 }
 
 #middle-row {
-    background-color: black;
+  background-color: black;
 }
+
 
 /*GAME BUTTONS*/
 
 .simon-btn {
-    -webkit-filter: brightness(0.7);
+  -webkit-filter: brightness(0.7);
 }
 
 .btn-green {
-    background-color: green;
+  background-color: green;
 }
 
 .btn-red {
-    background-color: red;
+  background-color: red;
 }
 
 .btn-yellow {
-    background-color: yellow;
+  background-color: yellow;
 }
 
 .btn-blue {
-    background-color: blue;
+  background-color: blue;
 }
 
 .flash {
-    -webkit-filter: brightness(1.0);
+  -webkit-filter: brightness(1.0);
 }
