@@ -1,14 +1,11 @@
 // Simon: by Jacob Stoebel
 
-var Simon = function(strict) {
+var Simon = function() {
     //strict (bool): if we are playing the game in strict mode
 
     //SET UP
-
-    this.strict = strict;
     this.speed = 1000;  //speed of time between moves (in ms)
     this.moves = [];
-    
     //set up sounds
     this.sounds = {};
     for(var i=1; i<=4; i++){
@@ -21,9 +18,15 @@ var Simon = function(strict) {
 
     this.wrongSound = new Audio("http://www.tvdsb.ca/webpages/balestrins/files/voicebuzzer.mp3");
 
+    this.winnerSound = new Audio("http://soundbible.com/grab.php?id=1003&type=mp3")
+
     //METHODS
 
     //playback
+
+    this.isStrict = function(){
+        return $("#strict-btn").hasClass("active")
+    }
 
     this.flash = function(move){
         //adds flash class to button
@@ -79,6 +82,10 @@ var Simon = function(strict) {
 
     this.playWrongSound = function(){
         this.wrongSound.play();
+    }
+
+    this.playWinnerSound = function() {
+        this.winnerSound.play();
     }
 
     this.playback = function(){
@@ -149,7 +156,7 @@ var Simon = function(strict) {
                 //wrong guess!
                 game.playWrongSound();
                 
-                if(game.strict){
+                if(game.isStrict()){
                     game.gameOver(false);
                 } else {
                     setTimeout(function(){
@@ -165,6 +172,7 @@ var Simon = function(strict) {
     this.addStep = function(){
         var step = (Math.floor((Math.random() * 4) + 1));
         this.moves.push(step);
+        this.updateCounter(this.moves.length);
         this.playback();
     }
 
@@ -173,19 +181,20 @@ var Simon = function(strict) {
         //advance to next level unless we are on level 20, in which case the player wins!
 
         console.log("level up!")
+        //set display
         switch(this.moves.length) {
 
             case 20:
                 this.gameOver(true);
-                break
+                return
             case 12:
-                this.speed = 125;
-                break
-            case 8:
                 this.speed = 250;
                 break
-            case 4:
+            case 8:
                 this.speed = 500;
+                break
+            case 4:
+                this.speed = 750;
                 break
         }
 
@@ -209,13 +218,25 @@ var Simon = function(strict) {
         console.log("GAME OVER!")
         if(win){
             console.log("You win!")
+            this.playWinnerSound();
         } else {
             console.log("You lose!")
         }
 
+        setTimeout(function(){
+            startGame();
+        }, 1000)
+
         //TODO other clean up needed here
     }
 
+}
+
+function startGame(){
+    //start a new game
+    var newGame = new Simon();
+    newGame.moves = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    newGame.addStep();
 }
 
 $(document).ready(function(){
@@ -229,9 +250,9 @@ $(document).ready(function(){
     $("#start-btn").on("click", function(){
         console.log("start clicked")
         $("#start-btn").off("click")    //can't click again! must use restart
-        var strict = $("#strict-btn").hasClass("active")
-        var game = new Simon(strict);
-        game.addStep();
+        // var game = new Simon();
+        // game.addStep();
+        startGame();
     })
 
 
@@ -243,14 +264,10 @@ $(document).ready(function(){
     //handler for reset
 
     $("#reset-btn").on("click", function(){
-
-        $("#display").text(0);
-
-        var strict = $("#strict-btn").hasClass("active")
-        var newGame = new Simon(strict);
-        game.addStep();
+        // var newGame = new Simon(strict);
+        // newGame.addStep();
+        startGame();
     })
-
 
     //TESTING
 
